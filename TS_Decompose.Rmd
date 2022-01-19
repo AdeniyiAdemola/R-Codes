@@ -1,0 +1,33 @@
+---
+title: "Untitled"
+author: "demola"
+date: "1/18/2022"
+output: html_document
+---
+
+```{r}
+library(readxl)
+library(dplyr)
+```
+```{r}
+lending<- read.csv("~/Desktop/R Data/crudeoilprices.csv", header = TRUE)
+lending
+```
+```{r}
+lending <- ts(lending[2:35,2], start=c(2011,1),frequency = 12)
+plot(tslending)
+```
+```{r}
+timeseriescomponents <- decompose(tslending)
+plot(timeseriescomponents)
+```
+
+```{r}
+urkpssTest(lending, type=c("tau"), lags=c("short"),use.lag = NULL,doplot = TRUE)
+tsstationary<-diff(lending,differences=1)
+plot(lending)
+```
+```{r}
+]
+
+```
