@@ -1,0 +1,107 @@
+---
+title: "World Lending"
+author: "demola"
+date: "1/19/2022"
+output: html_document
+---
+
+```{r}
+library(readr)
+library(fUnitRoots)
+library(lmtest)
+library(fpp2)
+library(forecast)
+library(urca)
+```
+```{r}
+interest <- read.csv("~/Desktop/R Data/world-lendinginterestrate.xlsx - Data.csv")
+View(interest)
+```
+```{r}
+tsinterest <- ts(interest[2:51, 2], start = 1976, frequency = 12)
+```
+```{r}
+plot(tsinterest)
+```
+```{r}
+sum(is.na(tsinterest))
+```
+```{r}
+summary(ur.df(y=tsinterest, type = "none",lags=1))
+```
+```{r}
+timeseriescomponents <- decompose(tsinterest)
+plot(timeseriescomponents)
+```
+```{r}
+KPSS TEST
+my_urkpssTest <- function(x, type, use.lag, doplot) {
+x<- as.vector(x)
+urca <- urca::ur.kpss(x, type = type[1], lags = lags[1], use.lag = use.lag)
+output = capture.output(urca::summary(urca))[-(1:4)]
+output = output[-length(output)]
+for (i in vector) {
+  
+}
+}
+```
+```{r}
+tsstationary <-diff(tsinterest, differences=1)
+plot(tsstationary)
+par(mfrow=c(2,1))
+tsstationary<- diff(timeseriesseasonaladjusted, differences=1)
+plot(tsstationary)
+```
+USING Dickey Fuller First you use ACF Test
+```{r}
+acf(tsinterest,lag.max = 34)
+tsinterest
+```
+Decompose the Seasonality
+```{r}
+timeseriesseasonaladjusted <- tsinterest - timeseriescomponents$seasonal
+plot(timeseriesseasonaladjusted)
+par(mfrow=c(2,1))
+```
+```{r}
+timeseriesseasonaladjusted <- tsingterest- timeseriescomponents$seasonal
+plot
+```
+
+```{r}
+acf(tsinterest,lag.max = 34)
+pacf(tsstationary, lag.max = 34)
+```
+Fitting  time series Model
+```{r}
+set.seed(51)
+fitARIMA <- arima(tsinterest, order = c(1,1,1), seasonal = list(order = c(1,0,1),
+            period = 12), method = "ML")
+fitARIMA
+```
+checking for coefficience
+```{r}
+coeftest(fitARIMA)
+par(mfrow=c(1,1))
+#checking for autocorrelation between lagged Periods
+acf(fitARIMA$residuals)
+```
+```{r}
+#LJung-Box Q Test
+boxresult<-LjungBoxTest (fitARIMA$residuals,k=2, StartLag=1)
+par(mfrow=c(2,1))
+plot(boxresult[,3],main="Ljung-Box Q Test", ylab="P-values", xlab="Lag")
+```
+```{r}
+qqnorm(fitARIMA$residuals)
+qqline(fitARIMA$residuals)
+```
+```{r}
+auto.arima(tsinterest, trace=TRUE)
+```
+```{r}
+par(mfrow=c(1,1))
+predict(fitARIMA,n.ahead = 5)
+futurVal <- forecast.Arima(fitARIMA,h=10, level=c(99.5))
+plot.forecast(futurVal)
+```
